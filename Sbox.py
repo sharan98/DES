@@ -25,6 +25,9 @@ sbox4 = {
     '10': [10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4],
     '11': [3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14]
 }
+
+sboxes = (sbox1, sbox2, sbox3, sbox4)
+
 """
     binary_string must be 6 bits long.
     First and last bits together form the row.

@@ -19,8 +19,7 @@ def toStr(h, enc = 'utf'):
 def toBinArray(s, enc = 'utf'):
     s = ''.join(s.split())
     byte_array = bytearray(s, enc)
-    ints = [int(bin(b), 2) for b in byte_array]
-    bin_array = [format(i, '0>8b') for i in ints]
+    bin_array = [format(i, '0>8b') for i in byte_array]
     return bin_array
 
 """ Convert binary array to hexadecimal array """
@@ -50,3 +49,25 @@ def binStrToStr(bin_str):
         ar.append(bin_str[i:i+8])
     text = binArrayToStr(ar)
     return text
+
+"""
+    A xor B
+    returns an integer
+"""
+def xor(A, B):
+    size = len(A)
+    assert (len(B) == size), 'operands not of same size in xor: a = {}, b = {}'.format(A, B)
+    a = int(A, 2)
+    b = int(B, 2)
+    res = a ^ b
+    return res
+
+"""
+    Convert hexadecimal string to binary string
+"""
+def hexToBin(hex_string):
+    l = []
+    for h in hex_string:
+        i = int(h, 16)
+        l.append(format(i, '0>4b'))
+    return ''.join(l)    
