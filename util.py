@@ -3,7 +3,7 @@
     each character -> hexadecimal value
 """
 def toHex(s, enc = 'utf'):
-    s = ''.join(s.split())
+    # s = ''.join(s.split())
     P = s.encode(enc).hex()
     return P
 
@@ -70,4 +70,8 @@ def hexToBin(hex_string):
     for h in hex_string:
         i = int(h, 16)
         l.append(format(i, '0>4b'))
-    return ''.join(l)    
+    return ''.join(l)
+
+def binToHex(bin_string):
+    i = int(bin_string, 2)
+    return format(i, 'x')

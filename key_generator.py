@@ -1,6 +1,5 @@
 from Dbox import Dbox
-
-""" INCOMPLETE """
+from util import hexToBin
 parityDropTable = {
     1: 57, 
     2: 49,
@@ -57,16 +56,14 @@ parityDropTable = {
     53: 28,
     54: 20,
     55: 12,
-    56: 4,
-    
-                    
+    56: 4           
 }
-""" INCOMPLETE """
+
 compressionTable = {
     1: 14,
     2: 17,
     3: 11,
-    4: 24
+    4: 24,
     5: 1,
     6: 5,
     7: 3,
@@ -111,9 +108,10 @@ compressionTable = {
     46: 36,
     47: 29,
     48: 32
-    
 }
 
+K = 'aabb09182736ccdd'
+K_b = hexToBin(K)
 def Lshift(string):
     f = string[0]
     new_str = string[1:] + f
@@ -123,9 +121,9 @@ def Lshift(string):
     keyWithParities: 64 bit binary
     returns list with 16 keys, each of length 48 bits
 """
-def key_generator(keyWithParities):
-    keys = []
-    key = Dbox(keyWithParities, parityDropTable)
+def key_generator(keyWithParities = K_b):
+    keys = []       # list to store the 16 subKeys
+    key = Dbox(keyWithParities, parityDropTable)    # 64 bits -> 56 bits : Compression D box
     left = key[:28]
     right = key[28:]
     left_shift = (1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1)
@@ -135,6 +133,6 @@ def key_generator(keyWithParities):
         if left_shift[round] == 2:
             left = Lshift(left)
             right = Lshift(right)
-        k = Dbox(left + right, compressionTable)
+        k = Dbox(left + right, compressionTable)    # 56 bits -> 48 bits : Compression D box
         keys.append(k)
     return keys

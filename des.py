@@ -1,9 +1,12 @@
 from mixer import mixer
-from swapper import swapper
 from Dbox import Dbox
+from util import binToHex, hexToBin
+import logging
+from key_generator import key_generator
 import itertools
 
-sample_key = '101101101101101101101101101101101101101101101101'
+logging.basicConfig(filename = 'des.log', level = logging.DEBUG)
+
 initial_P_table = {
                     1: 58,
                     2: 50,
@@ -20,7 +23,7 @@ initial_P_table = {
                     13: 28,
                     14: 20,
                     15: 12,
-                    16: 04,
+                    16: 4,
                     17: 62,
                     18: 54,
                     19: 46,
@@ -40,7 +43,7 @@ initial_P_table = {
                     33: 57,
                     34: 49,
                     35: 41,
-                    36; 33,
+                    36: 33,
                     37: 25,
                     38: 17,
                     39: 9,
@@ -68,11 +71,8 @@ initial_P_table = {
                     61: 31,
                     62: 23,
                     63: 15,
-                    64: 7,
-                
-            
+                    64: 7
 }
-
 
 final_P_table= {
                     1: 40,
@@ -110,7 +110,7 @@ final_P_table= {
                     33: 36,
                     34: 4,
                     35: 44,
-                    36; 12,
+                    36: 12,
                     37: 52,
                     38: 20,
                     39: 60,
@@ -138,40 +138,60 @@ final_P_table= {
                     61: 49,
                     62: 17,
                     63: 57,
-                    64: 25,
-                
-            
+                    64: 25
 }
+
+""" 
+    Swaps the left and right halves of binary string
+    Binary string length must be even
+"""
+def swapper(binary_string):
+    size = len(binary_string)
+    assert (size % 2 == 0), 'Binary string length is not even'
+    mid_index = size // 2
+    left = binary_string[:mid_index]
+    right = binary_string[mid_index:]
+    return right + left
+
 """
     binary_string must be 64 bits long.
     key must be 48 bits long.
     Returns 64 bits long binary string.
 """
-# def des_round(binary_string, key = sample_key):
-#     mixed = mixer(binary_string, key)
-#     swapped = swapper(mixed)
-#     return swapped
-"""
-    binary_string must be 64 bits long.
-    key must be 48 bits long.
-    Returns 64 bits long binary string.
-"""
-def encryptBlock(binary_string, keys = [sample_key]):
+def encryptBlock(binary_string, key):
+    logging.info ("Encrypting.")
+    keys = key_generator(key)
+    logging.info ("PlainText: {}".format(binToHex(binary_string)))
     init_permuted = Dbox(binary_string, initial_P_table)
     b = init_permuted
+    logging.info ("Initial permutation: {}".format(binToHex(b)))
     for r in range(16):
-        b = mixer(b, keys[0])
+        logging.info('Mixing {} with key {}'.format(binToHex(b), binToHex(keys[r])))
+        b = mixer(b, keys[r])
         if r != 15:
+            logging.info ("Swapped")
             b = swapper(b)
-    fin_permuted = Dbox(binary_string, final_P_table)
+        logging.info ("Round: {}, Left: {}, Right: {}, Key: {}".format(r + 1, binToHex(b)[:8], binToHex(b)[8:], binToHex(keys[r])))
+    logging.info ("After 16 rounds: {}".format(binToHex(b)))
+    fin_permuted = Dbox(b, final_P_table)
+    logging.info ("After final permutation: {}".format(binToHex(fin_permuted)))
     return fin_permuted
 
-def decryptBlock(binary_string, keys = [sample_key]):
+def decryptBlock(binary_string, key):
+    logging.info ("Decrypting.")
+    keys = key_generator(key)
+    logging.info ("CipherText: {}".format(binToHex(binary_string)))
     init_permuted = Dbox(binary_string, initial_P_table)
     b = init_permuted
+    logging.info ("Initial permutation: {}".format(binToHex(b)))
     for r in range(16):
-        b = mixer(b, keys[0])
+        logging.info('Mixing {} with key {}'.format(binToHex(b), binToHex(keys[15 - r])))
+        b = mixer(b, keys[15 - r])
         if r != 15:
+            logging.info ("Swapped")
             b = swapper(b)
-    fin_permuted = Dbox(binary_string, final_P_table)
+        logging.info ("Round: {}, Left: {}, Right: {}, Key: {}".format(r + 1, binToHex(b)[:8], binToHex(b)[8:], binToHex(keys[15 - r])))
+    logging.info ("After 16 rounds: {}".format(binToHex(b)))
+    fin_permuted = Dbox(b, final_P_table)
+    logging.info ("After final permutation: {}".format(binToHex(fin_permuted)))
     return fin_permuted
