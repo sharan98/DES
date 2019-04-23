@@ -25,6 +25,10 @@
 
 # your implementation does not have any of the 36,568 possible single-fault 
 # errors.
+
+"""
+    http://people.csail.mit.edu/rivest/Destest.txt
+"""
 from util import binToHex, hexToBin
 from des import encryptBlock, decryptBlock
 
@@ -44,3 +48,5 @@ if b == hexToBin(X16):
     print ('\nDES is working.')
 else:
     print ('\nDES is not working.')
+
+print ('\nAs given in http://people.csail.mit.edu/rivest/Destest.txt')

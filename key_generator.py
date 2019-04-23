@@ -112,6 +112,7 @@ compressionTable = {
 
 K = 'aabb09182736ccdd'
 K_b = hexToBin(K)
+
 def Lshift(string):
     f = string[0]
     new_str = string[1:] + f
@@ -122,8 +123,10 @@ def Lshift(string):
     returns list with 16 keys, each of length 48 bits
 """
 def key_generator(keyWithParities = K_b):
+    assert (len(keyWithParities) == 64), 'Incorrect key length: key_generator'
     keys = []       # list to store the 16 subKeys
     key = Dbox(keyWithParities, parityDropTable)    # 64 bits -> 56 bits : Compression D box
+    assert (len(key) == 56), 'Error in parityDrop: key_generator'
     left = key[:28]
     right = key[28:]
     left_shift = (1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1)
@@ -134,5 +137,6 @@ def key_generator(keyWithParities = K_b):
             left = Lshift(left)
             right = Lshift(right)
         k = Dbox(left + right, compressionTable)    # 56 bits -> 48 bits : Compression D box
+        assert (len(k) == 48), 'Error in key compression: key_generator'
         keys.append(k)
     return keys

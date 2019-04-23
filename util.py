@@ -35,6 +35,11 @@ def binArrayToStr(bin_array):
     text = toStr(hex_str)
     return text
 
+""" Convert byte array to binary string """
+def bytesToBinString(byte_array):
+    bin_array = [format(i, '0>8b') for i in byte_array]
+    return ''.join(bin_array)
+
 """ Convert string to binary """
 def strToBin(s, enc = 'utf'):
     s = ''.join(s.split())
@@ -52,6 +57,7 @@ def binStrToStr(bin_str):
 
 """
     A xor B
+    A and B are both binary strings
     returns an integer
 """
 def xor(A, B):
@@ -64,6 +70,8 @@ def xor(A, B):
 
 """
     Convert hexadecimal string to binary string
+    Each hex digit -> 4 bit binary
+    Eg: '02' -> '00000010'
 """
 def hexToBin(hex_string):
     l = []
@@ -72,6 +80,15 @@ def hexToBin(hex_string):
         l.append(format(i, '0>4b'))
     return ''.join(l)
 
+"""
+    binary string to hexadecimal.
+    First grouped to bloxks of 4bits.
+    Eg: '00000010' -> '02'
+"""
 def binToHex(bin_string):
-    i = int(bin_string, 2)
-    return format(i, 'x')
+    l = []
+    for i in range(0, len(bin_string), 4):
+        b = bin_string[i: i + 4]
+        i = int(b, 2)
+        l.append(format(i, '0>1x'))
+    return ''.join(l)

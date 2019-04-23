@@ -147,7 +147,7 @@ final_P_table= {
 """
 def swapper(binary_string):
     size = len(binary_string)
-    assert (size % 2 == 0), 'Binary string length is not even'
+    assert (size % 2 == 0), 'Binary string length is not even: swapper'
     mid_index = size // 2
     left = binary_string[:mid_index]
     right = binary_string[mid_index:]
@@ -155,21 +155,23 @@ def swapper(binary_string):
 
 """
     binary_string must be 64 bits long.
-    key must be 48 bits long.
+    This is the plaintext.
+    key must be 64 bits long.
     Returns 64 bits long binary string.
+    Returns the cipher text.
 """
 def encryptBlock(binary_string, key):
     logging.info ("Encrypting.")
+    assert (len(key) == 64), 'Key is not 64 bits long: encryptBlock'
+    assert (len(binary_string) == 64), 'binary_string is not 64 bits long: encryptBlock'
     keys = key_generator(key)
     logging.info ("PlainText: {}".format(binToHex(binary_string)))
     init_permuted = Dbox(binary_string, initial_P_table)
     b = init_permuted
     logging.info ("Initial permutation: {}".format(binToHex(b)))
     for r in range(16):
-        logging.info('Mixing {} with key {}'.format(binToHex(b), binToHex(keys[r])))
         b = mixer(b, keys[r])
         if r != 15:
-            logging.info ("Swapped")
             b = swapper(b)
         logging.info ("Round: {}, Left: {}, Right: {}, Key: {}".format(r + 1, binToHex(b)[:8], binToHex(b)[8:], binToHex(keys[r])))
     logging.info ("After 16 rounds: {}".format(binToHex(b)))
@@ -177,18 +179,25 @@ def encryptBlock(binary_string, key):
     logging.info ("After final permutation: {}".format(binToHex(fin_permuted)))
     return fin_permuted
 
+"""
+    binary_string must be 64 bits long.
+    This is the cipher text.
+    key must be 64 bits long.
+    Returns 64 bits long binary string.
+    Returns the plain text.
+"""
 def decryptBlock(binary_string, key):
     logging.info ("Decrypting.")
+    assert (len(key) == 64), 'Key is not 64 bits long: decryptBlock'
+    assert (len(binary_string) == 64), 'binary_string is not 64 bits long: decryptBlock'
     keys = key_generator(key)
     logging.info ("CipherText: {}".format(binToHex(binary_string)))
     init_permuted = Dbox(binary_string, initial_P_table)
     b = init_permuted
     logging.info ("Initial permutation: {}".format(binToHex(b)))
     for r in range(16):
-        logging.info('Mixing {} with key {}'.format(binToHex(b), binToHex(keys[15 - r])))
         b = mixer(b, keys[15 - r])
         if r != 15:
-            logging.info ("Swapped")
             b = swapper(b)
         logging.info ("Round: {}, Left: {}, Right: {}, Key: {}".format(r + 1, binToHex(b)[:8], binToHex(b)[8:], binToHex(keys[15 - r])))
     logging.info ("After 16 rounds: {}".format(binToHex(b)))

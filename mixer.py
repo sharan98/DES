@@ -1,6 +1,6 @@
 from Sbox import Sbox, sboxes
 from Dbox import Dbox
-from util import xor, binToHex, hexToBin
+from util import xor, binToHex
 import logging
 
 Ptable = {
@@ -106,12 +106,13 @@ def whitener(binary_string, key, size = 48):
     Returns 32 bit binary string
 """
 def des_func(binary_string, key):
-    assert(len(binary_string) == 32), 'Binary string not 32 bits long: {}'.format(len(binary_string))
+    assert(len(binary_string) == 32), 'Binary string not 32 bits long- {}: des function'.format(len(binary_string))
     logging.info ("des_func({}, {})".format(binToHex(binary_string), key))
 
     # Expand from 32 bits -> 48 bits
     expanded = Dbox(binary_string, Etable)
     logging.info ("After expanding: {}".format(binToHex(expanded)))
+    assert (len(expanded) == 48), 'Error in expansion box: des function'
 
     # xor with key
     whitened = whitener(expanded, key)
@@ -131,10 +132,11 @@ def des_func(binary_string, key):
         count += 1
     S = ''.join(l)
     logging.info ('After Sboxes: {}'.format(binToHex(S)))
-
+    assert (len(S) == 32), 'Error in Sboxes: des function'
     # final straight D box
     P = Dbox(S, Ptable)
-    logging.info('After final dbox: returning {}'.format(binToHex(P)))
+    logging.info('After final dbox in des func {}'.format(binToHex(P)))
+    assert (len(P) == 32), 'Error in final stright permutation: des function'
     return P
 
 """
@@ -145,14 +147,12 @@ def des_func(binary_string, key):
     Returns 64 bits long binary string
 """
 def mixer(binary_string, key):
-    assert (len(binary_string) == 64), "Binary string is not 64 bits long: {}".format(len(binary_string))
-    assert (len(key) == 48), "Binary string is not 48 bits long: {}".format(len(key))
-    logging.info ("Mixing: {}".format(binToHex(binary_string)))
+    assert (len(binary_string) == 64), "Binary string is not 64 bits long- {}: mixer".format(len(binary_string))
+    assert (len(key) == 48), "Key is not 48 bits long- {}: mixer".format(len(key))
     left = binary_string[:32]
     right = binary_string[32:]
     R = des_func(right, key)
     L = xor(left, R)
     L = format(L, '0>32b')
-    logging.info ('returning - left: {}, right: {}'.format(L, right))
     mixed = L + right
     return mixed

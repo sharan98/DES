@@ -1,0 +1,40 @@
+Testing:
+    des_test.py:
+        A method given by Ronald Rivest in 1985
+        http://people.csail.mit.edu/rivest/Destest.txt
+        run: python3 des_test.py
+    
+    test.py:
+        encryptHex(hexStr, key)             -> hex plain text to hex cipher text
+        decryptHex(hexStr, key)             -> hex cipher text to plain text string
+        encryptStringToHex(str, key)        -> plain text string to hex cipher text
+        decryptHexToString(hexStr, key)     -> hex cipher text to plain text string
+        encryptFile(filename, key)          -> file content to cipher text
+
+        Flow:
+            in terminal: from test import *
+            encryptStringToHex() to encrypt a string
+            decipher using decryptHexToString()
+            encryptFile() to encrypt a file
+            decipher using decryptHexToString()
+
+        Padding:
+            plaintext is padded with spaces if required.
+
+key_generator.py:
+    key_generator -> generates 16 sub keys
+    used only in des.py
+
+des.py:
+    encryptBlock and decryptBlock -> encrypt and decrypt 64 bit binary strings.
+
+mixer.py:
+    des_func and mixer
+    used only in des.py
+
+Dbox.py:
+    Dbox -> works for expansion, straight and compression D boxes
+
+Sbox.py:
+    Has the 8 Sboxes and the function
+    used only in mixer.py
